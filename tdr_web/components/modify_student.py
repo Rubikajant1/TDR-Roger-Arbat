@@ -308,13 +308,13 @@ def modificar_alumne() -> rx.Component:
                         on_click=AlumnState.delete_student,
                         width = '243px'
                     ),rx.button(
-                        "Cambier el correu del tutor",
+                        "Canviar el correu del tutor",
                         background_color=colors.PRIMARY.value,
                         on_click=AlumnState.tutor_change,
                         width = '243px'
                     ),
                     rx.button(
-                        "Cambiar el correu familiar",
+                        "Canviar el correu familiar",
                         background_color = colors.PRIMARY.value,
                         on_click=AlumnState.familly_change,
                         width = '243px'

@@ -736,7 +736,7 @@ def front_segon():
                     spacing="3",
                     align='start'
                 ),
-                rx.button('Veure les hores', on_click=Show_Column.more_clicks(), background_color=colors.VERD.value,),
+                rx.button('Veure informació', on_click=Show_Column.more_clicks(), background_color=colors.VERD.value,),
 
                 # Posar la variable de la taula d'alumnes que he fet anteriorment
                 # Afegir molts parametres estetics

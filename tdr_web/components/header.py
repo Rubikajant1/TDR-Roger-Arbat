@@ -83,7 +83,27 @@ class Estat(rx.State):
         
     def passar_trimestre(self):
         if self.contrassenya_trimestre == PASSWORD_TRIMESTRE:
-            return rx.toast.success('Passat')
+            try:
+                for curs_actual in ["4t ESO","3r ESO","2n ESO","1r ESO"]: # En ordre al reves perque si no es posa a 4t d'eso perque de primer pasa a segon de segon a tercer i després a quart
+                    resultat = dbalumnes.update_many(
+                        {'Curs': curs_actual}, 
+                        {'$set': {
+                            'Retards':0,
+                            'Faltes justificades':0,
+                            'Faltes no justificades':0,
+                            "Llista de retards":[],
+                            "Llista de faltes justificades":[],
+                            "Llista de faltes no justificades":[]
+                        }}                    
+                        
+                    )
+                return rx.toast.success(f"Trimestre reiniciat correctament")
+            except Exception as e:
+                print(e)
+                return rx.toast.error(f'Error al actualitzar els alumnes: {e}')
+        else:
+            print('error')
+            return rx.toast.error("Contrassenya incorrecte")
 
 def header() -> rx.Component:
     return rx.center(
