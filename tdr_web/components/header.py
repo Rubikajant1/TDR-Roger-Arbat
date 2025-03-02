@@ -283,6 +283,7 @@ def header() -> rx.Component:
                     margin_bottom='4em'
                 )
             ),
+            margin = '1em'
         )
     )
     
