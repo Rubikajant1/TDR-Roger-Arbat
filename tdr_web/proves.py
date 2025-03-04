@@ -6,9 +6,9 @@ db = db_client['Escola']
 dbprofe = db['professor']
 
 usuari:dict = {
-    "Correu":"noautoritzat@gmail.com",
-    "Contrassenya":"noautoritzat",
-    "Autoritzat":False
+    "Correu":"autoritzat@gmail.com",
+    "Contrassenya":"autoritzat",
+    "Autoritzat":True
 }
 
 dbprofe.insert_one(usuari)

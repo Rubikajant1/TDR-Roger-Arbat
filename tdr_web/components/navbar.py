@@ -9,12 +9,7 @@ def navbar() -> rx.Component:
     return rx.box(
         rx.flex(
             rx.hstack(
-                rx.avatar(
-                    fallback=Verify.user_input[0],
-                    color_scheme="green",
-                    high_contrast=False,
-                    variant="solid"
-                ),
+                    
                 rx.link(
                     'IE Josep Maria Xandri',
                     href='/',
@@ -62,8 +57,25 @@ def navbar() -> rx.Component:
                         ),
                         href='/modify_users'
                     ),
+                    rx.avatar(
+                        fallback=Verify.user_input[0],
+                        color_scheme="green",
+                        size='3',
+                        high_contrast=False,
+                        variant="solid"
+                    )
                 ),
             ),
+            rx.cond(
+                ~ is_autenticated,
+                rx.avatar(
+                    fallback=Verify.user_input[0],
+                    color_scheme="green",
+                    high_contrast=False,
+                    variant="solid"
+                )
+            ),
+        
             position = 'fixed',
             bg = colors.PRIMARY.value,
             width = '100%',
