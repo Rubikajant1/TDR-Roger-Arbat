@@ -1,6 +1,6 @@
 import reflex as rx
 from tdr_web.components.navbar import navbar
-from db.db_client import db_client
+from db.db_client import db
 from tdr_web.styles.colors import Colors as colors
 
 def chakra_input(placeholder,on_change,on_click) -> rx.Component:
@@ -36,7 +36,6 @@ def chakra_input(placeholder,on_change,on_click) -> rx.Component:
         }
     ),
 
-db = db_client['alumnes']
 
 # Obtener la colección (importante!)
 dbalumnes = db['alumnes']

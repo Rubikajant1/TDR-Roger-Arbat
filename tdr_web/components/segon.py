@@ -4,7 +4,7 @@
 import reflex as rx
 from reflex_ag_grid import ag_grid
 from bson import ObjectId
-from db.db_client import db_client
+from db.db_client import db
 from typing import List
 from tdr_web.styles.colors import Colors as colors
 from tdr_web.components.navbar import navbar
@@ -17,8 +17,6 @@ import datetime
 # Creo una variable amb totse els alumnes de segon d'ESO de la base de dades
 # Només surten els alumnes que s'han insertat com que fan segon d'eso
 # Tots els altres alumnes no surten
-
-db = db_client['alumnes']
 
 # Obtener la colección (importante!)
 dbalumnes = db['alumnes']  # o el nombre de tu colección

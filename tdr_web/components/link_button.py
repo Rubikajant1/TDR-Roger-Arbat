@@ -24,5 +24,4 @@ def link_button(title: str, body: str, url: str, disabled: bool = False) -> rx.C
             background_color=colors.PRIMARY.value,
         ),
         href=url,
-        is_external=True
     )

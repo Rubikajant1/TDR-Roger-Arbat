@@ -10,6 +10,9 @@ from tdr_web.components.tercer import tercer, AlumneState3r
 from tdr_web.components.quart import quart, AlumneState4t
 from tdr_web.components.add_students import afegir_alumnes
 from tdr_web.components.modify_student import modificar_alumne, AlumnState
+from tdr_web.components.add_teacher import add_teacher
+from tdr_web.components.modify_teacher import modificar_usuaris, TeacherState
+from db.db_client import db
 
 
 config = rx.Config(
@@ -23,19 +26,33 @@ CORRECT_PASSWORD = "tdrarbat0123"
 class Verify(rx.State):
     is_authenticated: bool = False
     password_input: str = ""
+    user_input:str = ""
     show_error: bool = False
+    user:dict = {}
 
-    def check_password(self):
-        hashed_input = hashlib.sha256(self.password_input.encode()).hexdigest()
-        hashed_correct = hashlib.sha256(CORRECT_PASSWORD.encode()).hexdigest()
 
-        if hashed_input == hashed_correct:
-            self.is_authenticated = True
-            self.show_error = False
-        else:
-            self.is_authenticated = False
-            self.show_error = True
-            self.password_input = ""
+    @rx.event
+    def send_password_input(self,pasword):
+        self.password_input = pasword
+
+    @rx.event
+    def send_user_input(self,user):
+        self.user_input = user
+        
+    def check_user(self):
+        dbprofe = db['professor']
+        usuari = dbprofe.find_one({"Correu":self.user_input})
+        hashed_password_input = hashlib.sha256(self.password_input.encode()).hexdigest()
+        hashed_correct = hashlib.sha256(usuari["Contrassenya"].encode()).hexdigest()
+        if usuari:
+            if hashed_password_input == hashed_correct:
+                self.is_authenticated = True
+                self.show_error = False
+                self.user = usuari
+            else:
+                self.is_authenticated = False
+                self.show_error = True
+                self.password_input = ""
 
     def logout(self):
         self.is_authenticated = False
@@ -62,23 +79,27 @@ def login_page() -> rx.Component:
         rx.vstack(
             rx.icon('lock-keyhole',color = colors.VERD.value,size=40),
             rx.heading("Accés restringit", size="7",color=colors.VERD.value),
-            rx.text("Siusplau, posa la contrassenya per entrar"),
-            rx.hstack(
-                rx.input(
-                    placeholder="Contrasenya",
-                    type="password",
-                    value=Verify.password_input,
-                    on_change=Verify.set_password_input,
-                    width='100%'
-                ),
-                rx.button(
-                    "Entrar", 
-                    on_click=Verify.check_password,
-                    color_scheme="blue",
-                    width = '40%',
-                    height = '100%',
-                    background_color = colors.PRIMARY.value
-                )
+            rx.text("Entra el teu usuari"),
+            rx.input(
+                placeholder="correu de l'usuari",
+                value=Verify.user_input,
+                on_change=Verify.send_user_input,
+                width='400px'
+            ),
+            rx.input(
+                placeholder="contrassenya",
+                value=Verify.password_input,
+                on_change=Verify.send_password_input,
+                type="password",
+                width='400px'
+            ),
+            rx.button(
+                "Entrar", 
+                on_click=Verify.check_user,
+                color_scheme="blue",
+                width = '400px',
+                height = "30px",
+                background_color = colors.PRIMARY.value
             ),
             rx.cond(
                 Verify.show_error,
@@ -107,22 +128,6 @@ def protected_content() -> rx.Component:
         spacing="4"
     )
 
-def protected_page(route: str):
-    # Función para páginas protegidas
-    @rx.route
-    def page():
-        # Verificar acceso antes de renderizar
-        access_check = Verify.check_access(route)
-        if access_check:
-            return access_check
-        
-        return rx.vstack(
-            rx.text(f"Contenido protegido de {route}"),
-            rx.button("Cerrar Sesión", on_click=Verify.logout)
-        )
-    return page
-
-
 def index() -> rx.Component:
     return rx.cond(
         Verify.is_authenticated,
@@ -146,3 +151,5 @@ app.add_page(tercer,route='/tercer', title='Tercer', on_load=AlumneState3r.initi
 app.add_page(quart,route='/quart', title='Quart', on_load=AlumneState4t.initial_load)
 app.add_page(afegir_alumnes,route='/add_student',title='Afegir alumnes')
 app.add_page(modificar_alumne,route='/modify_student',title='Modificar alumnes',on_load=AlumnState.load_alumnes)
+app.add_page(add_teacher,route='/add_teacher',title="Afegir professor")
+app.add_page(modificar_usuaris,route="/modify_users",title="Modificar usuaris",on_load=TeacherState.load_teachers)

@@ -2,11 +2,10 @@ import reflex as rx
 from tdr_web.styles.colors import Colors as colors
 from tdr_web.components.link_button import link_button
 from tdr_web.components.link_title import title
-from db.db_client import db_client
+from db.db_client import db
 
-db = db_client['alumnes']
 
-# Obtener la colección (importante!)
+
 dbalumnes = db['alumnes']
 
 PASSWORD_CURS="cursxandri0123"
@@ -82,30 +81,28 @@ class Estat(rx.State):
         
         
     def passar_trimestre(self):
-        if self.contrassenya_trimestre == PASSWORD_TRIMESTRE:
-            try:
-                for curs_actual in ["4t ESO","3r ESO","2n ESO","1r ESO"]: # En ordre al reves perque si no es posa a 4t d'eso perque de primer pasa a segon de segon a tercer i després a quart
-                    resultat = dbalumnes.update_many(
-                        {'Curs': curs_actual}, 
-                        {'$set': {
-                            'Retards':0,
-                            'Faltes justificades':0,
-                            'Faltes no justificades':0,
-                            "Llista de retards":[],
-                            "Llista de faltes justificades":[],
-                            "Llista de faltes no justificades":[]
-                        }}                    
+        try:
+            for curs_actual in ["4t ESO","3r ESO","2n ESO","1r ESO"]: # En ordre al reves perque si no es posa a 4t d'eso perque de primer pasa a segon de segon a tercer i després a quart
+                resultat = dbalumnes.update_many(
+                    {'Curs': curs_actual}, 
+                    {'$set': {
+                        'Retards':0,
+                        'Faltes justificades':0,
+                        'Faltes no justificades':0,
+                        "Llista de retards":[],
+                        "Llista de faltes justificades":[],
+                        "Llista de faltes no justificades":[]
+                    }}                    
                         
-                    )
-                return rx.toast.success(f"Trimestre reiniciat correctament")
-            except Exception as e:
-                print(e)
-                return rx.toast.error(f'Error al actualitzar els alumnes: {e}')
-        else:
-            print('error')
-            return rx.toast.error("Contrassenya incorrecte")
+                )
+            return rx.toast.success(f"Trimestre reiniciat correctament")
+        except Exception as e:
+            print(e)
+            return rx.toast.error(f'Error al actualitzar els alumnes: {e}')
 
 def header() -> rx.Component:
+    from tdr_web.tdr_web import Verify
+    is_autenticated = Verify.user["Autoritzat"]
     return rx.center(
         rx.vstack(
             rx.hstack(
@@ -141,146 +138,122 @@ def header() -> rx.Component:
             link_button("Alumnes de 2n d'ESO",'Comunitat de joves','/segon', False),
             link_button("Alumnes de 3r d'ESO",'Comunitat de joves','/tercer', False),
             link_button("Alumnes de 4t d'ESO",'Comunitat de joves','/quart', False),
-            rx.button(
-                rx.hstack(
-                    rx.icon(
-                        tag='arrow-big-right',
-                        color='white'
+            rx.cond(    
+                is_autenticated,
+                rx.box(rx.button(
+                        rx.hstack(
+                            rx.icon(
+                                tag='arrow-big-right',
+                                color='white'
+                            ),
+                            rx.vstack(
+                                rx.text("Passar de trimestre", color='white', size='4'),
+                                rx.text("Resetejar els retards, faltes justificades i no justificades de tots els alumnes", color='white')
+                            ),               
+                            width='580px',
+                            margin='1em',
+                            color='white',
+                        ),
+                        size='2',
+                        radius='medium',
+                        background_color='#2e8b57',
+                        on_click=Estat.canviar_pts_trimestre()
                     ),
-                    rx.vstack(
-                        rx.text("Passar de trimestre", color='white', size='4'),
-                        rx.text("Resetejar els retards, faltes justificades i no justificades de tots els alumnes", color='white')
-                    ),               
-                    width='580px',
-                    margin='1em',
-                    color='white',
-                ),
-                size='2',
-                radius='medium',
-                background_color='#2e8b57',
-                on_click=Estat.canviar_pts_trimestre()
-            ),
-            rx.cond(
-                Estat.confirmar_trimestre,
-                rx.text("Estàs segur que vols passar de trimestre?")
-            ),
-            rx.cond(
-                Estat.confirmar_trimestre,
-                rx.text("Tots els retards, faltes justificades i no justifades seran resetejades")
-            ),
-            rx.cond(
-                Estat.confirmar_trimestre,
-                rx.input(
-                    placeholder="Posa la contrassenya requerida per passar de trimestre",
-                    on_change=Estat.send_contrassenya_trimestre,
-                    type="password",
-                    width="100%",
-                    px="4",
-                    py="2",
-                    border="1px solid",
-                    border_color="gray.200",
-                    border_radius="md",
-                    bg="white",
-                    font_size="md",
-                    color="gray.800",
-                    _placeholder={"color": "gray.400"},
-                    _hover={
-                        "border_color": "blue.500",
-                    },
-                    _focus={
-                        "border_color": "blue.500",
-                        "box_shadow": "0 0 0 1px #3182ce",
-                        "outline": "none"
-                    },
-                    _invalid={
-                        "border_color": "red.500",
-                        "_hover": {"border_color": "red.600"},
-                        "_focus": {
-                            "border_color": "red.500",
-                            "box_shadow": "0 0 0 1px #E53E3E"
-                        }
-                    }
-                ),
-            ),
-            rx.cond(
-                Estat.confirmar_trimestre,
-                rx.button(
-                    'Confirmar',
-                    background_color=colors.VERD.value,
-                    width='100%',
-                    on_click=Estat.passar_trimestre(),
-                    margin_bottom='4em'
+                    rx.cond(
+                        Estat.confirmar_trimestre,
+                        rx.text("Estàs segur que vols passar de trimestre?", margin="0.3em"),
+                    ),
+                    rx.cond(
+                        Estat.confirmar_trimestre,
+                        rx.text("Tots els retards, faltes justificades i no justifades seran resetejades")
+                    ),
+                    rx.cond(
+                        Estat.confirmar_trimestre,
+                        rx.button(
+                            'Confirmar',
+                            background_color=colors.VERD.value,
+                            width='100%',
+                            on_click=Estat.passar_trimestre(),
+                            margin_bottom='4em',
+                            margin = "0.3em"
+                        )
+                    )
                 )
             ),
-            rx.button(
-                rx.hstack(
-                    rx.icon(
-                        tag='arrow-big-right',
-                        color='white'
+            rx.cond(
+                is_autenticated,
+                rx.box(
+                    rx.button(
+                        rx.hstack(
+                            rx.icon(
+                                tag='arrow-big-right',
+                                color='white'
+                            ),
+                            rx.vstack(
+                                rx.text("Passar de curs", color='white', size='4'),
+                                rx.text("Passar a tots els alumnes de curs", color='white')
+                            ),               
+                            width='580px',
+                            margin='1em',
+                            color='white',
+                        ),
+                        size='2',
+                        radius='medium',
+                        background_color='#2e8b57',
+                        on_click=Estat.canviar_pts_curs()
                     ),
-                    rx.vstack(
-                        rx.text("Passar de curs", color='white', size='4'),
-                        rx.text("Passar a tots els alumnes de curs", color='white')
-                    ),               
-                    width='580px',
-                    margin='1em',
-                    color='white',
-                ),
-                size='2',
-                radius='medium',
-                background_color='#2e8b57',
-                on_click=Estat.canviar_pts_curs()
-            ),
-            rx.cond(
-                Estat.confirmar_curs,
-                rx.text("Estàs segur que vols passar a tots els alumnes de curs?")
-            ),
-            rx.cond(
-                Estat.confirmar_curs,
-                rx.text("Tots els alumnes de 4t d'ESO seran eliminats")
-            ),
-            rx.cond(
-                Estat.confirmar_curs,
-                rx.input(
-                    placeholder="Posa la contrassenya requerida per passar de curs",
-                    on_change=Estat.send_contrassenya_curs,
-                    type='password',
-                    width="100%",
-                    px="4",
-                    py="2",
-                    border="1px solid",
-                    border_color="gray.200",
-                    border_radius="md",
-                    bg="white",
-                    font_size="md",
-                    color="gray.800",
-                    _placeholder={"color": "gray.400"},
-                    _hover={
-                        "border_color": "blue.500",
-                    },
-                    _focus={
-                        "border_color": "blue.500",
-                        "box_shadow": "0 0 0 1px #3182ce",
-                        "outline": "none"
-                    },
-                    _invalid={
-                        "border_color": "red.500",
-                        "_hover": {"border_color": "red.600"},
-                        "_focus": {
-                            "border_color": "red.500",
-                            "box_shadow": "0 0 0 1px #E53E3E"
-                        }
-                    }
-                ),
-            ),
-            rx.cond(
-                Estat.confirmar_curs,
-                rx.button(
-                    'Confirmar',
-                    background_color=colors.VERD.value,
-                    width='100%',
-                    on_click=Estat.passar_curs(),
-                    margin_bottom='4em'
+                    rx.cond(
+                        Estat.confirmar_curs,
+                        rx.text("Estàs segur que vols passar a tots els alumnes de curs?")
+                    ),
+                    rx.cond(
+                        Estat.confirmar_curs,
+                        rx.text("Tots els alumnes de 4t d'ESO seran eliminats")
+                    ),
+                    rx.cond(
+                        Estat.confirmar_curs,
+                        rx.input(
+                            placeholder="Posa la contrassenya requerida per passar de curs",
+                            on_change=Estat.send_contrassenya_curs,
+                            type='password',
+                            width="100%",
+                            px="4",
+                            py="2",
+                            border="1px solid",
+                            border_color="gray.200",
+                            border_radius="md",
+                            bg="white",
+                            font_size="md",
+                            color="gray.800",
+                            _placeholder={"color": "gray.400"},
+                            _hover={
+                                "border_color": "blue.500",
+                            },
+                            _focus={
+                                "border_color": "blue.500",
+                                "box_shadow": "0 0 0 1px #3182ce",
+                                "outline": "none"
+                            },
+                            _invalid={
+                                "border_color": "red.500",
+                                "_hover": {"border_color": "red.600"},
+                                "_focus": {
+                                    "border_color": "red.500",
+                                    "box_shadow": "0 0 0 1px #E53E3E"
+                                }
+                            }
+                        ),
+                    ),
+                    rx.cond(
+                        Estat.confirmar_curs,
+                        rx.button(
+                            'Confirmar',
+                            background_color=colors.VERD.value,
+                            width='100%',
+                            on_click=Estat.passar_curs(),
+                            margin_bottom='4em'
+                        )
+                    ),
                 )
             ),
             margin = '1em'

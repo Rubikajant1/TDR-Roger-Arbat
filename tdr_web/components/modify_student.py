@@ -1,12 +1,11 @@
 import reflex as rx
 import dataclasses
 from tdr_web.components.navbar import navbar
-from db.db_client import db_client
+from db.db_client import db
 from tdr_web.styles.colors import Colors as colors
 from reflex_ag_grid import ag_grid
 from typing import List
 
-db = db_client['alumnes']
 dbalumnes = db['alumnes']
 
 @dataclasses.dataclass

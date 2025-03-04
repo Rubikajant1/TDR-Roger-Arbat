@@ -1,9 +1,7 @@
 import reflex as rx
 from tdr_web.components.navbar import navbar
 from tdr_web.styles.colors import Colors as colors
-from db.db_client import db_client
-
-db = db_client['alumnes']
+from db.db_client import db
 
 # Obtener la colección (importante!)
 dbalumnes = db['alumnes']
