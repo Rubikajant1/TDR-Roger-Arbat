@@ -256,6 +256,14 @@ def header() -> rx.Component:
                     ),
                 )
             ),
+            rx.button(
+                        "Tancar sessió",
+                        on_click=Verify.logout,
+                        color_scheme="red",
+                        width='100%',
+                        height="30px",
+                        margin_top="20px"
+                    ),
             margin = '1em'
         )
     )

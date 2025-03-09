@@ -16,13 +16,23 @@ class TeacherState(rx.State):
     sort_value: str = ""
     pts:int = 0
     tutor:bool = False
-    
+
+
     def load_teachers(self):
         raw_teacher = [
             {**teacher, '_id': str(teacher['_id'])}
             for teacher in dbprofes.find({})
         ]
-        self.teacher_list = raw_teacher
+        self.teacher_list =[
+            {
+                **teacher,
+                "Autoritzat": teacher.get("Autoritzat"),
+                "auth": "Administrador" if teacher.get("Autoritzat") == True else "Usuari bàsic"
+            }
+            # Cicle for per a cada alumne de la variable row alumnes creada anteriorment
+            for teacher in raw_teacher
+        ]
+
 
     @rx.var(cache=True)
     def filtered_teachers(self) -> list:
@@ -113,20 +123,20 @@ column_defs = [
         header_name="", 
         checkboxSelection=True,
         headerCheckboxSelection=True,
-        width='50%'
+        width='55px'
     ),
     ag_grid.column_def(
         field="Correu", 
         header_name="Correu",
         cellRenderer="agAnimateShowChangedCellRenderer",
-        width='120%',
-        sortable=True
+        width='570px',
+        sortable=True,
     ),
     ag_grid.column_def(
-        field="Autoritzat",
-        header_name="Autoritzat",
+        field="auth",
+        header_name="Autorització",
         cellRenderer="agAnimateShowChangedCellRenderer",
-        width='308',
+        width='570px',
         sortable=True
     )
 ]

@@ -54,7 +54,7 @@ def add_teacher() -> rx.Component:
                 ),
                 rx.text("Tipus d'accés"),
                 rx.select(
-                    ['Administrador',"Usuari corrent"],
+                    ['Administrador',"Usuari bàsic"],
                     width='100%',
                     on_change=AddTeacher.send_autoritzat,
                 ),

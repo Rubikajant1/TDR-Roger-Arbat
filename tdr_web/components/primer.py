@@ -31,20 +31,22 @@ class AlumneState1r(rx.State):
     # Variables globals de la classe
     alumnes: list[dict] = []
     selected_alumne_ids: List[str] = []
-    er:str
+    er_tutor:str = ''
+    er_familia:str = ''
     ps = 'twvf hlgm psfq swdk' 
     e_sender = 'tdrarbat@gmail.com'
 
     def get_tutor_email(self):
         # Metode per trobar el correu del tutor individual de l'alumne
         if self.selected_alumne_ids and self.alumnes:
-            selected_alumno = next(
+            selected_alumne = next(
                 (alumno for alumno in self.alumnes if alumno['_id'] in self.selected_alumne_ids), 
                 None
             )
-            if selected_alumno:
-                self.er = selected_alumno.get('Correu del tutor', 'No disponible')
-                return self.er
+            if selected_alumne:
+                self.er_tutor = selected_alumne.get('Correu del tutor', 'No disponible')
+                self.er_familia = selected_alumne.get('Correu familiar', "No disponible")
+                return [self.er_tutor, self.er_familia]
                 
         print('Cap alumne seleccionat')
         
@@ -312,7 +314,7 @@ class AlumneState1r(rx.State):
 
         e_sender = self.e_sender
         ps = self.ps
-        er = self.er
+        er = self.er_tutor,self.er_familia
 
         # Preparar el text del correu amb l'informacio dels retards
         text = "Informe de Retards:\n\n"
@@ -358,7 +360,7 @@ class AlumneState1r(rx.State):
 
         e_sender = self.e_sender
         ps = self.ps
-        er = self.er
+        er = self.er_tutor,self.er_familia
 
         # Preparar el text del correu amb l'informacio dels retards
         text = "Informe de Retards:\n\n"
@@ -403,7 +405,7 @@ class AlumneState1r(rx.State):
 
         e_sender = self.e_sender
         ps = self.ps
-        er = self.er
+        er = self.er_tutor,self.er_familia
 
         # Preparar el text del correu amb l'informacio dels retards
         text = "Informe de Faltes no justificades:\n\n"
@@ -448,7 +450,7 @@ class AlumneState1r(rx.State):
 
         e_sender = self.e_sender
         ps = self.ps
-        er = self.er
+        er = self.er_tutor,self.er_familia
 
         # Preparar el text del correu amb l'informacio dels retards
         text = "Informe de Faltes no justificades:\n\n"
@@ -493,7 +495,7 @@ class AlumneState1r(rx.State):
 
         e_sender = self.e_sender
         ps = self.ps
-        er = self.er
+        er = self.er_tutor,self.er_familia
 
         # Preparar el text del correu amb l'informacio dels retards
         text = "Informe de Faltes justificades:\n\n"
@@ -537,7 +539,7 @@ class AlumneState1r(rx.State):
 
         e_sender = self.e_sender
         ps = self.ps
-        er = self.er
+        er = self.er_tutor,self.er_familia
 
         # Preparar el text del correu amb l'informacio dels retards
         text = "Informe de Faltes justificades:\n\n"

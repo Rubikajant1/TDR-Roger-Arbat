@@ -55,7 +55,10 @@ class Verify(rx.State):
                 self.password_input = ""
 
     def logout(self):
+        self.user_input = ""
+        self.password_input = ""
         self.is_authenticated = False
+        return rx.redirect("/") 
     
     def autenticar(self):
         self.is_authenticated = True
