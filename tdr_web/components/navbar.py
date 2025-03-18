@@ -1,15 +1,21 @@
+### Navbar ###
+#Funció que és cridada a totes les pàgines de la web
+
+#Importacions
 import reflex as rx
 from tdr_web.styles.colors import Colors as colors
-from db.db_client import db
 
 
+#Funció front-end
 def navbar() -> rx.Component:
+    #Importar dintre de la funció per evitar una importació circular
     from tdr_web.tdr_web import Verify
+    #Variable per saber si l'usuari està autoritzat
     is_autenticated = Verify.user["Autoritzat"]
     return rx.box(
         rx.flex(
-            rx.hstack(
-                    
+            rx.hstack(    
+                #Link que et porta a la pàgina principal
                 rx.link(
                     'IE Josep Maria Xandri',
                     href='/',
@@ -19,9 +25,11 @@ def navbar() -> rx.Component:
                     _hover = None,
                 ),
             ),
+            #Si està autoritzat mostrar els botons
             rx.cond(
                 is_autenticated,
                 rx.hstack(
+                    #Botons
                     rx.link(
                     rx.button(
                         'Afegir alumnes',
@@ -57,6 +65,7 @@ def navbar() -> rx.Component:
                         ),
                         href='/modify_users'
                     ),
+                    #Avatar
                     rx.avatar(
                         fallback=Verify.user_input[0],
                         color_scheme="green",
@@ -66,6 +75,7 @@ def navbar() -> rx.Component:
                     )
                 ),
             ),
+            #Avatar per si no està autoritzat
             rx.cond(
                 ~ is_autenticated,
                 rx.avatar(
@@ -75,7 +85,7 @@ def navbar() -> rx.Component:
                     variant="solid"
                 )
             ),
-        
+            #Parametres estetics
             position = 'fixed',
             bg = colors.PRIMARY.value,
             width = '100%',
@@ -86,3 +96,4 @@ def navbar() -> rx.Component:
             justify='between'
         )
     )
+

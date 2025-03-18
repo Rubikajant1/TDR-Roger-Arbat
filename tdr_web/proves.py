@@ -6,6 +6,7 @@ db = db_client['Escola']
 dbprofe = db['professor']
 
 usuari:dict = {
+    'Nom':'',
     "Correu":"autoritzat@gmail.com",
     "Contrassenya":"autoritzat",
     "Autoritzat":True

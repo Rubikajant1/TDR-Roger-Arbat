@@ -1,3 +1,7 @@
+### Header ###
+#Cos de la pàgina principal
+
+#Importacions
 import reflex as rx
 from tdr_web.styles.colors import Colors as colors
 from tdr_web.components.link_button import link_button
@@ -5,13 +9,10 @@ from tdr_web.components.link_title import title
 from db.db_client import db
 
 
-
+# Base de dades per als alumnes
 dbalumnes = db['alumnes']
 
-PASSWORD_CURS="cursxandri0123"
-PASSWORD_TRIMESTRE="trimestrexandri0123"
-
-
+#Classe per al back-end (Passar de curs i de trimestre)
 class Estat(rx.State):
     confirmar_curs:bool = False
     confirmar_trimestre:bool = False
@@ -50,34 +51,30 @@ class Estat(rx.State):
             self.confirmar_curs=False
     
     def passar_curs(self):
-        if self.contrassenya_curs == PASSWORD_CURS:
-            try:
-                quart = list(dbalumnes.find({'Curs':'4t ESO'}))
-                if quart:
-                    resultats_eliminacio=dbalumnes.delete_many({'Curs':'4t ESO'})
-                    rx.toast.success(f"Alumnes de 4t d'ESO eliminats: {resultats_eliminacio.deleted_count}")
+        try:
+            quart = list(dbalumnes.find({'Curs':'4t ESO'}))
+            if quart:
+                resultats_eliminacio=dbalumnes.delete_many({'Curs':'4t ESO'})
+                rx.toast.success(f"Alumnes de 4t d'ESO eliminats: {resultats_eliminacio.deleted_count}")
                 
-                for curs_actual, nou_curs in [('3r ESO','4t ESO'),('2n ESO','3r ESO'),('1r ESO','2n ESO')]: # En ordre al reves perque si no es posa a 4t d'eso perque de primer pasa a segon de segon a tercer i després a quart
-                    resultat = dbalumnes.update_many(
-                        {'Curs': curs_actual}, 
-                        {'$set': {
-                            'Curs': nou_curs,
-                            'Retards':0,
-                            'Faltes justificades':0,
-                            'Faltes no justificades':0,
-                            "Llista de retards":[],
-                            "Llista de faltes justificades":[],
-                            "Llista de faltes no justificades":[]
-                        }}                    
+            for curs_actual, nou_curs in [('3r ESO','4t ESO'),('2n ESO','3r ESO'),('1r ESO','2n ESO')]: # En ordre al reves perque si no es posa a 4t d'eso perque de primer pasa a segon de segon a tercer i després a quart
+                resultat = dbalumnes.update_many(
+                    {'Curs': curs_actual}, 
+                    {'$set': {
+                        'Curs': nou_curs,
+                        'Retards':0,
+                        'Faltes justificades':0,
+                        'Faltes no justificades':0,
+                        "Llista de retards":[],
+                        "Llista de faltes justificades":[],
+                        "Llista de faltes no justificades":[]
+                    }}                    
                         
-                    )
-                return rx.toast.success(f"Alumnes canviats de curs correctament {resultat.modified_count}")
-            except Exception as e:
-                print(e)
-                return rx.toast.error(f'Error al actualitzar els alumnes: {e}')
-        else:
-            print('error')
-            return rx.toast.error("Contrassenya incorrecte")
+                )
+            return rx.toast.success(f"Alumnes canviats de curs correctament {resultat.modified_count}")
+        except Exception as e:
+            print(e)
+            return rx.toast.error(f'Error al actualitzar els alumnes: {e}')
         
         
     def passar_trimestre(self):
@@ -100,6 +97,8 @@ class Estat(rx.State):
             print(e)
             return rx.toast.error(f'Error al actualitzar els alumnes: {e}')
 
+
+#Funció front-end 
 def header() -> rx.Component:
     from tdr_web.tdr_web import Verify
     is_autenticated = Verify.user["Autoritzat"]
@@ -114,6 +113,7 @@ def header() -> rx.Component:
                     object_fit="cover",
                     alt="Logo IE Josep maria xandri"
                 ),
+                #Titol i text de presentació
                 rx.vstack(
                     title(
                         "IE Josep Maria Xandri",
@@ -128,16 +128,21 @@ def header() -> rx.Component:
                 spacing="4",
                 align='center'
             ),
+            #Text introductiu
             rx.text(
                 f"""Aquesta pàgina web serveix per millorar la forma que es posen els retards,
                 faltes justificades i no justificades als alumnes de secundària de l'IE Josep Maria Xandri.
                 """,
                 padding = '2em'
             ),
+            #Botons que accedeixen al curs corresponent
             link_button("Alumnes de 1r d'ESO",'Comunitat de joves','/primer',False),
             link_button("Alumnes de 2n d'ESO",'Comunitat de joves','/segon', False),
             link_button("Alumnes de 3r d'ESO",'Comunitat de joves','/tercer', False),
             link_button("Alumnes de 4t d'ESO",'Comunitat de joves','/quart', False),
+            #Amb el cond es posa com a parametre de que si esta autenticat
+            #Si ho està es mostra tot el que hi haigi a dintre
+            #Si no no es mostra ni s'interactua amb els botons
             rx.cond(    
                 is_autenticated,
                 rx.box(rx.button(
@@ -159,6 +164,7 @@ def header() -> rx.Component:
                         background_color='#2e8b57',
                         on_click=Estat.canviar_pts_trimestre()
                     ),
+                    #Textos on s'alarma del que passarà
                     rx.cond(
                         Estat.confirmar_trimestre,
                         rx.text("Estàs segur que vols passar de trimestre?", margin="0.3em"),
@@ -167,6 +173,7 @@ def header() -> rx.Component:
                         Estat.confirmar_trimestre,
                         rx.text("Tots els retards, faltes justificades i no justifades seran resetejades")
                     ),
+                    #Botó per confirmar que es vol passar de trimestre
                     rx.cond(
                         Estat.confirmar_trimestre,
                         rx.button(
@@ -183,6 +190,7 @@ def header() -> rx.Component:
             rx.cond(
                 is_autenticated,
                 rx.box(
+                    #Botó principal per passar de curs
                     rx.button(
                         rx.hstack(
                             rx.icon(
@@ -202,6 +210,7 @@ def header() -> rx.Component:
                         background_color='#2e8b57',
                         on_click=Estat.canviar_pts_curs()
                     ),
+                    #Un cop apretat el botó surten dos textos especificant el que pot passar
                     rx.cond(
                         Estat.confirmar_curs,
                         rx.text("Estàs segur que vols passar a tots els alumnes de curs?")
@@ -210,40 +219,7 @@ def header() -> rx.Component:
                         Estat.confirmar_curs,
                         rx.text("Tots els alumnes de 4t d'ESO seran eliminats")
                     ),
-                    rx.cond(
-                        Estat.confirmar_curs,
-                        rx.input(
-                            placeholder="Posa la contrassenya requerida per passar de curs",
-                            on_change=Estat.send_contrassenya_curs,
-                            type='password',
-                            width="100%",
-                            px="4",
-                            py="2",
-                            border="1px solid",
-                            border_color="gray.200",
-                            border_radius="md",
-                            bg="white",
-                            font_size="md",
-                            color="gray.800",
-                            _placeholder={"color": "gray.400"},
-                            _hover={
-                                "border_color": "blue.500",
-                            },
-                            _focus={
-                                "border_color": "blue.500",
-                                "box_shadow": "0 0 0 1px #3182ce",
-                                "outline": "none"
-                            },
-                            _invalid={
-                                "border_color": "red.500",
-                                "_hover": {"border_color": "red.600"},
-                                "_focus": {
-                                    "border_color": "red.500",
-                                    "box_shadow": "0 0 0 1px #E53E3E"
-                                }
-                            }
-                        ),
-                    ),
+                    # Si s'ha apretat el primer botó surt aquest per confirmar que no está fet per error
                     rx.cond(
                         Estat.confirmar_curs,
                         rx.button(
@@ -256,14 +232,15 @@ def header() -> rx.Component:
                     ),
                 )
             ),
+            #Botó (tant per els usuaris com per els administradors) que està fora del cond(d'aquesta manera tothom hi pot accedir)
             rx.button(
-                        "Tancar sessió",
-                        on_click=Verify.logout,
-                        color_scheme="red",
-                        width='100%',
-                        height="30px",
-                        margin_top="20px"
-                    ),
+               "Tancar sessió",
+                on_click=Verify.logout,
+                color_scheme="red",
+                width='100%',
+                height="30px",
+                margin_top="20px"
+            ),
             margin = '1em'
         )
     )
