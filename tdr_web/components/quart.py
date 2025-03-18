@@ -31,8 +31,8 @@ class AlumneState4t(rx.State):
     selected_alumne_ids: List[str] = []
     er_tutor:str = ''
     er_familia:str = ''
-    ps = 'twvf hlgm psfq swdk' 
-    e_sender = 'tdrarbat@gmail.com'
+    ps = 'La teva contrassenya' 
+    e_sender = 'El teu correu'
 
 
     #Funció per trobar el correu del tutor

@@ -31,8 +31,8 @@ class AlumneState2n(rx.State):
     selected_alumne_ids: List[str] = []
     er_tutor:str = ''
     er_familia:str = ''
-    ps = 'contrassenya' 
-    e_sender = 'el teu correu'
+    ps = 'La teva contrassenya' 
+    e_sender = 'El teu correu'
 
 
     #Funció per trobar el correu del tutor

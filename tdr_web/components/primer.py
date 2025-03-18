@@ -31,7 +31,7 @@ class AlumneState1r(rx.State):
     selected_alumne_ids: List[str] = []
     er_tutor:str = ''
     er_familia:str = ''
-    ps = 'contrassenya' 
+    ps = 'La teva contrassenya' 
     e_sender = 'el teu correu'
 
 
